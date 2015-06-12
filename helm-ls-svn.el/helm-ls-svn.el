@@ -58,7 +58,12 @@
     (user-error "Not under a svn repository"))
   (helm :sources
         (helm-build-in-buffer-source "SVN files"
-          :header-name (lambda (name) (format "%s (%s)" name (helm-ls-svn-branch)))
+          :header-name (lambda (name)
+                         (let ((branch (helm-ls-svn-branch)))
+                           (format
+                            "%s (%s)"
+                            name (if (string-empty-p branch)
+                                     (helm-ls-svn-root-dir) branch))))
           :init
           (lambda ()
             (let ((root (helm-ls-svn-root-dir)))
