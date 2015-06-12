@@ -25,8 +25,17 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
 ;;
+;; `helm-ls-svn.el' is a helm extension for listing files in svn project.
+;;
+;;
+;; TODO
+;; ====
+;;
+;; - Create project buffers source
+;; - Create my own class inheriting from one of helm main classes
+;; - Create svn status source
+
 
 ;;; Code:
 
