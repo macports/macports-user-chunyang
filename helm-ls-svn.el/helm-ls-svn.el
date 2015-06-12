@@ -32,7 +32,6 @@
 ;; TODO
 ;; ====
 ;;
-;; - Create project buffers source
 ;; - Create my own class inheriting from one of helm main classes
 ;; - Create svn status source
 
@@ -60,31 +59,42 @@
   (shell-command-to-string
    "svn info | grep '^URL:' | egrep -o '(tags|branches)/[^/]+|trunk' | egrep -o '[^/]+$' | tr -d '\n'"))
 
+(defvar helm-source-ls-svn-buffers nil)
+
+(defun helm-ls-svn-header-name (name)
+  (let ((branch (helm-ls-svn-branch)))
+    (format "%s (%s)"
+            name (if (string-empty-p branch)
+                     (helm-ls-svn-root-dir) branch))))
+
 ;;;###autoload
 (defun helm-ls-svn-ls ()
   (interactive)
   (when (helm-ls-svn-not-inside-svn-repo)
     (user-error "Not under a svn repository"))
+  (unless helm-source-ls-svn-buffers
+    (setq helm-source-ls-svn-buffers
+          (helm-make-source "Buffers in project" 'helm-source-buffers
+            :header-name #'helm-ls-svn-header-name
+            :buffer-list (lambda () (helm-browse-project-get-buffers
+                                     (helm-ls-svn-root-dir))))))
   (helm :sources
-        (helm-build-in-buffer-source "SVN files"
-          :header-name (lambda (name)
-                         (let ((branch (helm-ls-svn-branch)))
-                           (format
-                            "%s (%s)"
-                            name (if (string-empty-p branch)
-                                     (helm-ls-svn-root-dir) branch))))
-          :init
-          (lambda ()
-            (let ((root (helm-ls-svn-root-dir)))
-              (with-current-buffer (helm-candidate-buffer 'global)
-                (call-process-shell-command
-                 (format "find %s -type f -not -iwholename '*.svn/*'"
-                         root)
-                 nil t ))))
-          :help-message helm-generic-file-help-message
-          :keymap helm-ls-svn-map
-          :candidate-number-limit 9999
-          :action (helm-actions-from-type-file))
+        (list
+         helm-source-ls-svn-buffers
+         (helm-build-in-buffer-source "SVN files"
+           :header-name #'helm-ls-svn-header-name
+           :init
+           (lambda ()
+             (let ((root (helm-ls-svn-root-dir)))
+               (with-current-buffer (helm-candidate-buffer 'global)
+                 (call-process-shell-command
+                  (format "find %s -type f -not -iwholename '*.svn/*'"
+                          root)
+                  nil t ))))
+           :help-message helm-generic-file-help-message
+           :keymap helm-ls-svn-map
+           :candidate-number-limit 9999
+           :action (helm-actions-from-type-file)))
         :buffer "*helm ls svn*"))
 
 (provide 'helm-ls-svn)
