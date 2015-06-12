@@ -2,10 +2,10 @@
 
 ;; Copyright (C) 2015  Chunyang Xu
 
-;; Author: Chunyang Xu <xuchunyang56@gmail.com>
+;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
 ;; Version: 0.1
-;; URL: https://github.com/xuchunyang/helm-ls-svn
+;; URL: https://trac.macports.org/browser/users/chunyang/helm-ls-svn.el
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0"))
 ;; Keywords: helm svn
 
