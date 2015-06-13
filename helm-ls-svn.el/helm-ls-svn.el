@@ -49,6 +49,11 @@
   "Helm completion for svn repos."
   :group 'helm)
 
+(defcustom helm-ls-svn-status-command 'vc-dir
+  "Favorite svn-status command for emacs."
+  :group 'helm-ls-svn
+  :type 'symbol)
+
 (defvar helm-ls-svn-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
@@ -87,6 +92,13 @@
                      "svn" nil t nil
                      (list "status")))))))
 
+(defun helm-ls-svn-status-transformer (candidates _source)
+  (let ((root (helm-ls-svn-root-dir)))
+    (mapcar (lambda (candidate)
+              (cons candidate
+                    (expand-file-name (cadr (split-string candidate)) root)))
+            candidates)))
+
 (defclass helm-ls-svn-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
    (init :initform 'helm-ls-svn-init)
@@ -101,7 +113,14 @@
          (lambda ()
            (helm-init-candidates-in-buffer 'global
              (helm-ls-svn-status))))
-   (keymap :initform helm-ls-svn-map)))
+   (keymap :initform helm-ls-svn-map)
+   (filtered-candidate-transformer :initform 'helm-ls-svn-status-transformer)
+   (action :initform
+           (helm-make-actions
+            "Find file" 'helm-find-many-files
+            "svn status" (lambda (_candidate)
+                           (funcall helm-ls-svn-status-command
+                                    (helm-default-directory)))))))
 
 ;;;###autoload
 (defun helm-ls-svn-ls ()
