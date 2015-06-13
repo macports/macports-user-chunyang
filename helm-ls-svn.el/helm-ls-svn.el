@@ -6,7 +6,7 @@
 ;; Created: Wed Jun 10 20:58:26 CST 2015
 ;; Version: 0.1
 ;; URL: https://trac.macports.org/browser/users/chunyang/helm-ls-svn.el
-;; Package-Requires: ((emacs "24.1") (helm "1.7.0"))
+;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
 
 ;; This file is not part of Emacs.
@@ -32,7 +32,7 @@
 ;; TODO
 ;; ====
 ;;
-;; - Improve svn status source.
+;; - Implement persistent action (diff) for status source.
 ;; - Helm-find-files integration.
 ;; - Submit to melpa.
 ;; - Find out a suitable way to search in svn project.
@@ -40,6 +40,9 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+(require 'vc)
+(require 'vc-svn)
 (require 'helm-files)
 
 ;; Define the sources.
@@ -102,6 +105,52 @@
                     (expand-file-name (cadr (split-string candidate)) root)))
             candidates)))
 
+(defun helm-ls-svn-diff (candidate)
+  (find-file candidate)
+  (call-interactively #'vc-diff))
+
+(defun helm-ls-svn-revert (_candidate)
+  (let ((marked (helm-marked-candidates)))
+    (cl-loop for f in marked do
+             (progn
+               (vc-svn-revert f)
+               (helm-aif (get-file-buffer f)
+                   (with-current-buffer it
+                     (revert-buffer t t)))))))
+
+(defun helm-ls-svn-status-action-transformer (actions _candidate)
+  (let ((disp (helm-get-selection nil t)))
+    (cond ((string-match "^?" disp)
+           (append actions
+                   (helm-make-actions
+                    "Add files(s)"
+                    (lambda (candidate)
+                      (let ((default-directory
+                              (file-name-directory candidate))
+                            (marked (helm-marked-candidates)))
+                        (vc-call-backend 'SVN 'register marked)))
+                    "Delete file(s)"
+                    #'helm-delete-marked-files)))
+          ((string-match "^M" disp)
+           (append actions
+                   (helm-make-actions
+                    "Diff file" #'helm-ls-svn-diff
+                    "Commit file(s)"
+                    (lambda (_candidate)
+                      (let* ((marked (helm-marked-candidates))
+                             (default-directory
+                               (file-name-directory (car marked))))
+                        (vc-checkin marked 'SVN)))
+                    "Revert file(s)" #'helm-ls-svn-revert
+                    "Copy file(s) `C-u to follow'" #'helm-find-files-copy
+                    "Rename file(s) `C-u to follow'" #'helm-find-files-rename)))
+          ((string-match "^A" disp)
+           (append actions
+                   (helm-make-actions
+                    "svn delete" #'vc-svn-delete-file
+                    "Revert file(s)" #'helm-ls-svn-revert)))
+          (t actions))))
+
 (defclass helm-ls-svn-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
    (init :initform 'helm-ls-svn-init)
@@ -118,6 +167,10 @@
              (helm-ls-svn-status))))
    (keymap :initform helm-ls-svn-map)
    (filtered-candidate-transformer :initform 'helm-ls-svn-status-transformer)
+   ;; TODO: Implement persistent action
+   ;; (persistent-action :initform 'helm-ls-svn-diff)
+   ;; (persistent-help :initform "Diff")
+   (action-transformer :initform 'helm-ls-svn-status-action-transformer)
    (action :initform
            (helm-make-actions
             "Find file" 'helm-find-many-files
