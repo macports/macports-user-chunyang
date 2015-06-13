@@ -1,4 +1,4 @@
-;;; helm-ls-svn.el --- list svn files                -*- lexical-binding: t; -*-
+;;; helm-ls-svn.el --- helm extension to list svn files  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Chunyang Xu
 
