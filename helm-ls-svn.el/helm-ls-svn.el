@@ -117,7 +117,8 @@
         (cl-remove-if
          (lambda (item) (or (null item)
                             (file-directory-p item)))
-         (mapcar (lambda (item) (car (last (split-string item))))
+         (mapcar (lambda (item) (let ((file (car (last (split-string item)))))
+                                  (when (stringp file) (expand-file-name file))))
                  (split-string
                   (shell-command-to-string
                    "svn status --non-interactive --quiet --verbose")
