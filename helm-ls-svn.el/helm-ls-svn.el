@@ -33,7 +33,10 @@
 ;; ====
 ;;
 ;; - Improve svn status source.
-
+;; - Helm-find-files integration.
+;; - Submit to melpa.
+;; - Find out a suitable way to search in svn project.
+;; - Improve performance.
 
 ;;; Code:
 
