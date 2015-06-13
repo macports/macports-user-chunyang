@@ -120,7 +120,7 @@
          (mapcar (lambda (item) (car (last (split-string item))))
                  (split-string
                   (shell-command-to-string
-                   "svn status -non-interactive --quiet --verbose")
+                   "svn status --non-interactive --quiet --verbose")
                   "\n")))))))
 
 (defun helm-ls-svn-status ()
