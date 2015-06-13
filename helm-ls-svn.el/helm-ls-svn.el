@@ -107,7 +107,7 @@
 (defun helm-ls-svn-header-name (name)
   (let ((branch (helm-ls-svn-branch)))
     (format "%s (%s)"
-            name (if (string-empty-p branch)
+            name (if (string= branch "")
                      (helm-ls-svn-root-dir) branch))))
 
 (defun helm-ls-svn-collect-data()
