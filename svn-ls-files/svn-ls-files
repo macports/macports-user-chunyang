@@ -14,13 +14,13 @@ function usage {
 
 if [ $# -ne 0 ]
 then
-    cd $1 &> /dev/null || usage
+    cd "$1" &> /dev/null || usage
 fi
 
 for f in  $( svn status --quiet --verbose | awk '{ print $4 }' )
 do
-    if [ -f $f ]
+    if [ -f "$f" ]
     then
-       echo $f
+        echo "$f"
     fi
 done
