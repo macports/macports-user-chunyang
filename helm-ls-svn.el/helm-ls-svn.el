@@ -32,7 +32,7 @@
 ;; TODO
 ;; ====
 ;;
-;; - Create svn status source
+;; - Improve svn status source.
 
 
 ;;; Code:
@@ -40,6 +40,7 @@
 (require 'helm-files)
 
 ;; Define the sources.
+(defvar helm-source-ls-svn-status nil)
 (defvar helm-source-ls-svn nil)
 (defvar helm-source-ls-svn-buffers nil)
 
@@ -77,6 +78,15 @@
                root)
        nil t ))))
 
+(defun helm-ls-svn-status ()
+  (helm-aif (helm-ls-svn-root-dir)
+      (with-helm-default-directory it
+          (with-output-to-string
+            (with-current-buffer standard-output
+              (apply #'process-file
+                     "svn" nil t nil
+                     (list "status")))))))
+
 (defclass helm-ls-svn-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
    (init :initform 'helm-ls-svn-init)
@@ -84,6 +94,14 @@
    (help-message :initform helm-generic-file-help-message)
    (candidate-number-limit :initform 9999)
    (action :initform (helm-actions-from-type-file))))
+
+(defclass helm-ls-svn-status-source (helm-source-in-buffer)
+  ((header-name :initform 'helm-ls-svn-header-name)
+   (init :initform
+         (lambda ()
+           (helm-init-candidates-in-buffer 'global
+             (helm-ls-svn-status))))
+   (keymap :initform helm-ls-svn-map)))
 
 ;;;###autoload
 (defun helm-ls-svn-ls ()
@@ -98,8 +116,12 @@
                                      (helm-ls-svn-root-dir))))))
   (unless helm-source-ls-svn
     (setq helm-source-ls-svn
-          (helm-make-source "SVN files" 'helm-ls-svn-source)))
-  (helm :sources '(helm-source-ls-svn-buffers
+          (helm-make-source "svn files" 'helm-ls-svn-source)))
+  (unless helm-source-ls-svn-status
+    (setq helm-source-ls-svn-status
+          (helm-make-source "svn status" 'helm-ls-svn-status-source)))
+  (helm :sources '(helm-source-ls-svn-status
+                   helm-source-ls-svn-buffers
                    helm-source-ls-svn)
         :buffer "*helm ls svn*"))
 
