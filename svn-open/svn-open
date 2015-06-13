@@ -16,8 +16,8 @@ function usage {
 }
 
 function error_exit {
-        echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
-        exit 1
+    echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+    exit 1
 }
 
 svn info &> /dev/null || error_exit "$(pwd) not registered"
