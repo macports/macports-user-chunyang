@@ -5,7 +5,7 @@
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
 ;; Version: 0.1
-;; URL: https://trac.macports.org/browser/users/chunyang/helm-ls-svn.el
+;; URL: https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
 
@@ -82,7 +82,7 @@
   :group 'helm
   :link '(emacs-commentary-link :tag "commentary" "helm-ls-svn.el")
   :link '(emacs-library-link :tag "lisp file" "helm-ls-svn.el")
-  :link '(url-link :tag "web page" "https://trac.macports.org/browser/users/chunyang/helm-ls-svn.el"))
+  :link '(url-link :tag "web page" "https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el"))
 
 (defcustom helm-ls-svn-status-command 'vc-dir
   "Favorite svn-status command for emacs."
