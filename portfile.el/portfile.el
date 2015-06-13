@@ -3,14 +3,24 @@
 ;; Copyright (C) 2015  Chunyang Xu
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
-;; URL: https://trac.macports.org/browser/branches/gsoc15-portfile/portfile.el/
-;; Version: 0.0.1
+;; URL: https://svn.macports.org/repository/macports/users/chunyang/portfile.el/
+;; Version: 0.1
+;; Package-Requires: ((emacs "24.1"))
 ;; Created: Tue Jun  9 03:14:33 CST 2015
 ;; Keywords: MacPorts Portfile
 
 ;;; Commentary:
-
 ;;
+;; `portfile.el' aims to provide a major mode for editing MacPorts
+;; Portfiles. It's work in process and I consider it to be usable when the
+;; following functions are implemented:
+;;
+;; - syntax highlight
+;; - indent
+;; - run lint
+;;
+;; A good reference is mpvim (http://svn.macports.org/repository/macports/contrib/mpvim/).
+
 
 ;;; Code:
 
