@@ -81,13 +81,18 @@
             name (if (string-empty-p branch)
                      (helm-ls-svn-root-dir) branch))))
 
-(defun helm-ls-svn-init ()
+(defun helm-ls-svn-collect-data()
   (let ((root (helm-ls-svn-root-dir)))
     (with-current-buffer (helm-candidate-buffer 'global)
-      (call-process-shell-command
-       (format "find %s -type f -not -iwholename '*.svn/*'"
-               root)
-       nil t ))))
+      (let ((default-directory root))
+        (cl-remove-if
+         (lambda (item) (or (null item)
+                            (file-directory-p item)))
+         (mapcar (lambda (item) (car (last (split-string item))))
+                 (split-string
+                  (shell-command-to-string
+                   "svn status -non-interactive --quiet --verbose")
+                  "\n")))))))
 
 (defun helm-ls-svn-status ()
   (helm-aif (helm-ls-svn-root-dir)
@@ -153,7 +158,7 @@
 
 (defclass helm-ls-svn-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
-   (init :initform 'helm-ls-svn-init)
+   (data :initform 'helm-ls-svn-collect-data)
    (keymap :initform helm-ls-svn-map)
    (help-message :initform helm-generic-file-help-message)
    (candidate-number-limit :initform 9999)
