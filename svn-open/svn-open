@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Open svn repository URL in browser (inspired by git open)
+#
+# Written by Chunyang Xu <chunyang@macports.org>
+#
+# Latest version can be found at
+# https://svn.macports.org/repository/macports/users/chunyang/svn-open
+#
+
+PROGNAME=$(basename "$0")
+REPO_URL=""
+
+function usage {
+    echo "Usage - $PROGNAME [-r | --root]"
+}
+
+function error_exit {
+        echo "${PROGNAME}: ${1:-"Unknown Error"}" 1>&2
+        exit 1
+}
+
+svn info &> /dev/null || error_exit "$(pwd) not registered"
+
+if [ $# -ne 0 ]; then
+    if [ "$1" == "-r" ] || [ "$1" == "--root" ]; then
+        REPO_URL=$( svn info | grep '^Repository Root'| awk '{print $NF}' )
+    else
+        usage
+    fi
+else
+    REPO_URL=$( svn info | grep '^URL'| awk '{print $NF}' )
+fi
+
+open "$REPO_URL"
