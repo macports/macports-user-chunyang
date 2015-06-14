@@ -28,6 +28,9 @@
 ;;
 ;; `helm-ls-svn.el' is a helm extension for listing files in svn project.
 ;;
+;; This package is on MELPA (http://melpa.org/#/helm-ls-svn), you can always get
+;; the latest version from MELPA.
+;;
 ;;
 ;; Installation
 ;; ============
@@ -60,7 +63,6 @@
 ;;
 ;; - Implement persistent action (diff) for status source.
 ;; - Helm-find-files integration.
-;; - Submit to melpa.
 ;; - Find out a suitable way to search in svn project.
 ;; - Improve performance.
 
