@@ -89,6 +89,13 @@
   :group 'helm-ls-svn
   :type 'symbol)
 
+(defcustom helm-ls-svn-default-sources '(helm-source-ls-svn-status
+                                         helm-source-ls-svn-buffers
+                                         helm-source-ls-svn)
+  "Default sources list used in the `helm-ls-svn-ls' command."
+  :group 'helm-ls-svn
+  :type '(repeat (choice symbol)))
+
 (defvar helm-ls-svn-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-generic-files-map)
@@ -237,9 +244,7 @@
   (unless helm-source-ls-svn-status
     (setq helm-source-ls-svn-status
           (helm-make-source "svn status" 'helm-ls-svn-status-source)))
-  (helm :sources '(helm-source-ls-svn-status
-                   helm-source-ls-svn-buffers
-                   helm-source-ls-svn)
+  (helm :sources helm-ls-svn-default-sources
         :buffer "*helm ls svn*"))
 
 (provide 'helm-ls-svn)
