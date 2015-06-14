@@ -61,7 +61,6 @@
 ;; TODO
 ;; ====
 ;;
-;; - Implement persistent action (diff) for status source.
 ;; - Helm-find-files integration.
 ;; - Find out a suitable way to search in svn project.
 ;; - Improve performance.
@@ -143,8 +142,14 @@
             candidates)))
 
 (defun helm-ls-svn-diff (candidate)
-  (find-file candidate)
-  (call-interactively #'vc-diff))
+  (let (helm-persistent-action-use-special-display)
+    (with-current-buffer (find-file-noselect candidate)
+      (when (buffer-live-p (get-buffer "*vc-diff*"))
+        (kill-buffer "*vc-diff*")
+        (balance-windows))
+      (vc-svn-diff (list candidate) nil nil "*vc-diff*")
+      (pop-to-buffer "*vc-diff*")
+      (diff-mode))))
 
 (defun helm-ls-svn-revert (_candidate)
   (let ((marked (helm-marked-candidates)))
@@ -204,9 +209,8 @@
              (helm-ls-svn-status))))
    (keymap :initform helm-ls-svn-map)
    (filtered-candidate-transformer :initform 'helm-ls-svn-status-transformer)
-   ;; TODO: Implement persistent action
-   ;; (persistent-action :initform 'helm-ls-svn-diff)
-   ;; (persistent-help :initform "Diff")
+   (persistent-action :initform 'helm-ls-svn-diff)
+   (persistent-help :initform "Diff")
    (action-transformer :initform 'helm-ls-svn-status-action-transformer)
    (action :initform
            (helm-make-actions
