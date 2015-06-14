@@ -63,7 +63,6 @@
 ;;
 ;; - Helm-find-files integration.
 ;; - Find out a suitable way to search in svn project.
-;; - Improve performance.
 
 ;;; Code:
 
@@ -106,10 +105,12 @@
    "svn info | grep '^URL:' | egrep -o '(tags|branches)/[^/]+|trunk' | egrep -o '[^/]+$' | tr -d '\n'"))
 
 (defun helm-ls-svn-header-name (name)
-  (let ((branch (helm-ls-svn-branch)))
-    (format "%s (%s)"
-            name (if (string= branch "")
-                     (helm-ls-svn-root-dir) branch))))
+  ;; Don't call `helm-ls-svn-branch'' because it's very slow
+  ;; (let ((branch (helm-ls-svn-branch)))
+  ;;   (format "%s (%s)"
+  ;;           name (if (string= branch "")
+  ;;                    (helm-ls-svn-root-dir) branch)))
+  (format "%s (%s)" name (helm-ls-svn-root-dir)))
 
 (defun helm-ls-svn-collect-data()
   (let ((root (helm-ls-svn-root-dir)))
