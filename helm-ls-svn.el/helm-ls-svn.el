@@ -4,7 +4,7 @@
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
-;; Version: 0.1
+;; Version: 0.2
 ;; URL: https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el/
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
@@ -61,8 +61,7 @@
 ;; TODO
 ;; ====
 ;;
-;; - Helm-find-files integration.
-;; - Find out a suitable way to search in svn project.
+;; - `helm-browse-project' integration.
 
 ;;; Code:
 
