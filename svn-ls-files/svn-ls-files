@@ -5,7 +5,7 @@
 # Written by Chunyang Xu <chunyang@macports.org>
 #
 # Latest version can be found at
-# https://svn.macports.org/repository/macports/users/chunyang/svn-ls-files
+# https://svn.macports.org/repository/macports/users/chunyang/svn-ls-files/
 #
 
 function usage {
