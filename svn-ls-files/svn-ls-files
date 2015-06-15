@@ -9,15 +9,12 @@
 #
 
 function usage {
-    echo "Usage - $0 [PATH]"
+    echo "Usage - $(basename $0) [PATH]"
 }
 
 if [ $# -ne 0 ]; then
-    if cd "$1" &> /dev/null; then
-        ;
-    else
-        usage
-        exit 1
+    if ! cd "$1" &> /dev/null; then
+        usage ; exit 1
     fi
 fi
 
