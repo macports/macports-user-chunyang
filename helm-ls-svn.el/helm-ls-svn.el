@@ -56,12 +56,7 @@
 ;;
 ;; Bug report, suggestion and patch are welcome. Please email me (see above to
 ;; get my email address).
-;;
-;;
-;; TODO
-;; ====
-;;
-;; - `helm-browse-project' integration.
+
 
 ;;; Code:
 
@@ -81,7 +76,7 @@
   :group 'helm
   :link '(emacs-commentary-link :tag "commentary" "helm-ls-svn.el")
   :link '(emacs-library-link :tag "lisp file" "helm-ls-svn.el")
-  :link '(url-link :tag "web page" "https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el/"))
+  :link '(url-link :tag "MELPA" "http://melpa.org/#/helm-ls-svn"))
 
 (defcustom helm-ls-svn-status-command 'vc-dir
   "Favorite svn-status command for emacs."
@@ -236,10 +231,10 @@
                                     (helm-default-directory)))))))
 
 ;;;###autoload
-(defun helm-ls-svn-ls ()
-  (interactive)
-  (when (helm-ls-svn-not-inside-svn-repo)
-    (user-error "Not under a svn repository"))
+(defun helm-ls-svn-ls (&optional arg)
+  (interactive "p")
+  (and arg (helm-ls-svn-not-inside-svn-repo)
+       (user-error "Not under a svn repository"))
   (unless helm-source-ls-svn-buffers
     (setq helm-source-ls-svn-buffers
           (helm-make-source "Buffers in project" 'helm-source-buffers
