@@ -12,15 +12,15 @@ function usage {
     echo "Usage - $0 [PATH]"
 }
 
-if [ $# -ne 0 ]
-then
-    cd "$1" &> /dev/null || usage
+if [ $# -ne 0 ]; then
+    if cd "$1" &> /dev/null; then
+        ;
+    else
+        usage
+        exit 1
+    fi
 fi
 
-for f in  $( svn status --quiet --verbose | awk '{ print $4 }' )
-do
-    if [ -f "$f" ]
-    then
-        echo "$f"
-    fi
+for f in $( svn status --verbose --quiet | awk '{print $NF}' ); do
+    [[ -f $f ]] && echo "$f"
 done
