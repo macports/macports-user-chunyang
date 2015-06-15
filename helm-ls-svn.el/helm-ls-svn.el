@@ -144,7 +144,15 @@
 (defun helm-ls-svn-status-transformer (candidates _source)
   (let ((root (helm-ls-svn-root-dir)))
     (mapcar (lambda (candidate)
-              (cons candidate
+              (cons (cond ((string-match "^?" candidate)
+                           (propertize candidate 'face 'font-lock-variable-name-face))
+                          ((string-match "^M" candidate)
+                           (propertize candidate 'face 'font-lock-constant-face))
+                          ((string-match "^A" candidate)
+                           (propertize candidate 'face 'font-lock-variable-name-face))
+                          ((string-match "^C" candidate)
+                           (propertize candidate 'face 'font-lock-warning-face))
+                          (t candidate))
                     (expand-file-name (cadr (split-string candidate)) root)))
             candidates)))
 
@@ -156,7 +164,8 @@
         (balance-windows))
       (vc-svn-diff (list candidate) nil nil "*vc-diff*")
       (pop-to-buffer "*vc-diff*")
-      (diff-mode))))
+      (diff-mode)
+      (view-mode))))
 
 (defun helm-ls-svn-revert (_candidate)
   (let ((marked (helm-marked-candidates)))
