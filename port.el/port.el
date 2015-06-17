@@ -51,5 +51,26 @@ Letters do not insert themselves; instead, they are commands. "
       (tabulated-list-print t)
       (switch-to-buffer buf))))
 
+;;;###autoload
+(defun helm-port ()
+  (interactive)
+  (and
+   (require 'helm nil t)
+   (require 'subr-x nil t)
+   (helm :sources
+         (helm-build-sync-source "MacPorts"
+           :candidates (lambda ()
+                         (mapcar
+                          #'string-trim
+                          (split-string
+                           (shell-command-to-string "port -q installed requested")
+                           "\n")))
+           :action '(("Go to home page" .
+                      (lambda (candidate)
+                        (when-let ((string candidate) (regexp " (active)")
+                                   (index (string-match regexp string)))
+                          (setq candidate (substring string 0 index)))
+                        (shell-command (concat "port gohome " candidate)))))))))
+
 (provide 'port)
 ;;; port.el ends here
