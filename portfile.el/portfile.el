@@ -1,11 +1,10 @@
-;;; portfile.el --- Major mode for editing MacPorts Portfiles  -*- lexical-binding: t; -*-
+;;; portfile.el --- Major mode for editing MacPorts Portfiles
 
 ;; Copyright (C) 2015  Chunyang Xu
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; URL: https://svn.macports.org/repository/macports/users/chunyang/portfile.el/
 ;; Version: 0.1
-;; Package-Requires: ((emacs "24.1"))
 ;; Created: Tue Jun  9 03:14:33 CST 2015
 ;; Keywords: MacPorts Portfile
 
