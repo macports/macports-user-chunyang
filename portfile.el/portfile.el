@@ -49,7 +49,8 @@
 
 (define-derived-mode portfile-mode tcl-mode "portfile-mode"
   "Portfile mode"
-  (font-lock-add-keywords nil portfile-mode-font-lock-keywords))
+  (font-lock-add-keywords nil portfile-mode-font-lock-keywords)
+  (set (make-local-variable 'compile-command) "port lint --nitpick"))
 
 ;; Test:
 ;; (add-hook 'tcl-mode-hook (lambda ()
