@@ -32,10 +32,9 @@
 (define-derived-mode port-menu-mode tabulated-list-mode "MacPorts Port Menu"
   "Major mode browsing a list of ports.
 Letters do not insert themselves; instead, they are commands. "
-  (setq tabulated-list-format `[("Package" 18 t)
-                                ("Version" 13 nil)
-                                ("Status"  10 t)
-                                ("Description" 0 nil)])
+  (setq tabulated-list-format `[("Package" 18 nil)
+                                ("Version" 28 nil)
+                                ("Status"  11 nil)])
   (setq tabulated-list-padding 2)
   (setq tabulated-list-sort-key (cons "Status" nil))
   (tabulated-list-init-header))
@@ -47,7 +46,18 @@ Letters do not insert themselves; instead, they are commands. "
     (with-current-buffer buf
       (port-menu-mode)
       (setq tabulated-list-entries
-            (list (list "1" ["emacs" "24.5" "installed" "The GNU Emacs text editor"])))
+            (mapcar
+             (lambda (item)
+               (let ((port (split-string (string-trim item))))
+                 (list nil (vector (nth 0 port)
+                                   (nth 1 port)
+                                   (let ((status (nth 2 port)))
+                                     (if status (substring status 1 -1)
+                                       "deactivated"))))))
+             (butlast
+              (split-string
+               (shell-command-to-string "port -q installed requested")
+               "\n"))))
       (tabulated-list-print t)
       (switch-to-buffer buf))))
 
@@ -62,9 +72,10 @@ Letters do not insert themselves; instead, they are commands. "
            :candidates (lambda ()
                          (mapcar
                           #'string-trim
-                          (split-string
-                           (shell-command-to-string "port -q installed requested")
-                           "\n")))
+                          (butlast
+                           (split-string
+                            (shell-command-to-string "port -q installed requested")
+                            "\n"))))
            :action '(("Go to home page" .
                       (lambda (candidate)
                         (when-let ((string candidate) (regexp " (active)")
