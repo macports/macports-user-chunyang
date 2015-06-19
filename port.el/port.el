@@ -25,6 +25,8 @@
 ;; Latest version can be found at:
 ;; https://svn.macports.org/repository/macports/users/chunyang/port.el/
 
+;; NOTE: Use the command line program `port' is too slow.
+
 ;;; Code:
 
 (require 'tabulated-list)
