@@ -56,6 +56,13 @@
 ;;
 ;; Bug report, suggestion and patch are welcome. Please email me (see above to
 ;; get my email address).
+;;
+;;
+;; TODO
+;; ====
+;;
+;; - Allow showing base name (or related to project root path) for a clean look.
+;; - Handle conflict status, think about it, may or may not needed.
 
 
 ;;; Code:
