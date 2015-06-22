@@ -4,7 +4,7 @@
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
-;; Version: 0.2.1
+;; Version: 0.2.2
 ;; URL: https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el/helm-ls-svn.el
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
@@ -79,7 +79,6 @@
 ;; TODO
 ;; ====
 ;;
-;; - Sort candidates of status sources.
 ;; - Allow showing base name (or related to project root path) for a clean look.
 ;; - Handle conflict status, think about it, may or may not needed.
 
@@ -171,18 +170,21 @@ Return nil if not found."
 (defun helm-ls-svn-status-transformer (candidates _source)
   "`helm-ls-svn-status-source' CANDIDATES transformer."
   (let ((root (helm-ls-svn-root-dir)))
-    (mapcar (lambda (candidate)
-              (cons (cond ((string-match "^?" candidate)
-                           (propertize candidate 'face 'font-lock-variable-name-face))
-                          ((string-match "^M" candidate)
-                           (propertize candidate 'face 'font-lock-constant-face))
-                          ((string-match "^A" candidate)
-                           (propertize candidate 'face 'font-lock-variable-name-face))
-                          ((string-match "^C" candidate)
-                           (propertize candidate 'face 'font-lock-warning-face))
-                          (t candidate))
-                    (expand-file-name (cadr (split-string candidate)) root)))
-            candidates)))
+    (sort
+     (mapcar (lambda (candidate)
+               (cons (cond ((string-match "^?" candidate)
+                            (propertize candidate 'face 'font-lock-variable-name-face))
+                           ((string-match "^M" candidate)
+                            (propertize candidate 'face 'font-lock-constant-face))
+                           ((string-match "^A" candidate)
+                            (propertize candidate 'face 'font-lock-variable-name-face))
+                           ((string-match "^C" candidate)
+                            (propertize candidate 'face 'font-lock-warning-face))
+                           (t candidate))
+                     (expand-file-name (cadr (split-string candidate)) root)))
+             candidates)
+     (lambda (a b) (string> (substring (car a) 0 2)
+                            (substring (car b) 0 2))))))
 
 (defun helm-ls-svn-diff (candidate)
   "Diff action on CANDIDATE."
