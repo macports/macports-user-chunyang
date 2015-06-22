@@ -4,7 +4,7 @@
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
-;; Version: 0.2
+;; Version: 0.2.1
 ;; URL: https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el/helm-ls-svn.el
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
@@ -79,6 +79,7 @@
 ;; TODO
 ;; ====
 ;;
+;; - Sort candidates of status sources.
 ;; - Allow showing base name (or related to project root path) for a clean look.
 ;; - Handle conflict status, think about it, may or may not needed.
 
@@ -104,7 +105,7 @@
   :link '(url-link :tag "MELPA" "http://melpa.org/#/helm-ls-svn"))
 
 (defcustom helm-ls-svn-status-command 'vc-dir
-  "Favorite svn-status command for emacs."
+  "Favorite svn-status command for Emacs."
   :group 'helm-ls-svn
   :type 'symbol)
 
@@ -121,16 +122,21 @@
     map))
 
 (defun helm-ls-svn-root-dir (&optional directory)
+  "Return svn root directory or DIRECTORY.
+Return nil if not found."
   (locate-dominating-file (or directory default-directory) ".svn"))
 
 (defun helm-ls-svn-not-inside-svn-repo ()
+  "Not inside a svn repository."
   (not (helm-ls-svn-root-dir)))
 
 (defun helm-ls-svn-branch ()
+  "Return svn branch or trunk name."
   (shell-command-to-string
    "svn info | grep '^URL:' | egrep -o '(tags|branches)/[^/]+|trunk' | egrep -o '[^/]+$' | tr -d '\n'"))
 
 (defun helm-ls-svn-header-name (name)
+  "Compute `helm-ls-svn-ls' header name by using NAME."
   ;; Don't call `helm-ls-svn-branch'' because it's very slow
   ;; (let ((branch (helm-ls-svn-branch)))
   ;;   (format "%s (%s)"
@@ -153,6 +159,7 @@
                   "\n")))))))
 
 (defun helm-ls-svn-status ()
+  "Run svn status."
   (helm-aif (helm-ls-svn-root-dir)
       (with-helm-default-directory it
           (with-output-to-string
@@ -162,6 +169,7 @@
                      (list "status")))))))
 
 (defun helm-ls-svn-status-transformer (candidates _source)
+  "`helm-ls-svn-status-source' CANDIDATES transformer."
   (let ((root (helm-ls-svn-root-dir)))
     (mapcar (lambda (candidate)
               (cons (cond ((string-match "^?" candidate)
@@ -177,6 +185,7 @@
             candidates)))
 
 (defun helm-ls-svn-diff (candidate)
+  "Diff action on CANDIDATE."
   (let (helm-persistent-action-use-special-display)
     (with-current-buffer (find-file-noselect candidate)
       (when (buffer-live-p (get-buffer "*vc-diff*"))
@@ -188,6 +197,7 @@
       (view-mode))))
 
 (defun helm-ls-svn-revert (_candidate)
+  "Revert action on marked candidate(s)."
   (let ((marked (helm-marked-candidates)))
     (cl-loop for f in marked do
              (progn
@@ -197,6 +207,7 @@
                      (revert-buffer t t)))))))
 
 (defun helm-ls-svn-status-action-transformer (actions _candidate)
+  "Setup ACTIONS according to different candidates."
   (let ((disp (helm-get-selection nil t)))
     (cond ((string-match "^?" disp)
            (append actions
@@ -257,6 +268,9 @@
 
 ;;;###autoload
 (defun helm-ls-svn-ls (&optional arg)
+  "Use helm to list buffers/files in svn project.
+If ARG is nil, only possible when called from Lisp code, don't check if current
+buffer is under a svn project."
   (interactive "p")
   (and arg (helm-ls-svn-not-inside-svn-repo)
        (user-error "Not under a svn repository"))
