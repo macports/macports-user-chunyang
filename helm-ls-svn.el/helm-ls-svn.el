@@ -76,10 +76,16 @@
 ;; get my email address).
 ;;
 ;;
+;; Note
+;; ====
+;;
+;; The code of `helm-ls-svn.el' is based on `helm-ls-git.el'
+;; <https://github.com/emacs-helm/helm-ls-git>
+;;
+;;
 ;; TODO
 ;; ====
 ;;
-;; - Allow showing base name (or related to project root path) for a clean look.
 ;; - Handle conflict status, think about it, may or may not needed.
 
 
@@ -102,6 +108,14 @@
   :link '(emacs-commentary-link :tag "commentary" "helm-ls-svn.el")
   :link '(emacs-library-link :tag "lisp file" "helm-ls-svn.el")
   :link '(url-link :tag "MELPA" "http://melpa.org/#/helm-ls-svn"))
+
+(defcustom helm-ls-svn-show-abs-or-relative 'absolute
+  "Show full path or relative path to repo when using `helm-ff-toggle-basename'.
+Valid values are symbol 'abs (default) or 'relative."
+  :group 'helm-ls-svn
+  :type  '(radio :tag "Show full path or relative path to Svn repo when toggling"
+                 (const :tag "Show full path" absolute)
+                 (const :tag "Show relative path" relative)))
 
 (defcustom helm-ls-svn-status-command 'vc-dir
   "Favorite svn-status command for Emacs."
@@ -242,11 +256,32 @@ Return nil if not found."
                     "Revert file(s)" #'helm-ls-svn-revert)))
           (t actions))))
 
+(defun helm-ls-svn-transformer (candidates)
+  "Toggle abs and relative path for CANDIDATES."
+  (cl-loop with root = (helm-ls-svn-root-dir)
+           for i in candidates
+           for abs = (expand-file-name i root)
+           for disp = (if (and helm-ff-transformer-show-only-basename
+                               (not (string-match "[.]\\{1,2\\}$" i)))
+                          (helm-basename i)
+                        (cl-case helm-ls-svn-show-abs-or-relative
+                          (absolute abs)
+                          (relative (file-relative-name i root))))
+           collect
+           (cons (propertize disp 'face 'helm-ff-file) abs)))
+
+(defun helm-ls-svn-sort-fn (candidates)
+  "Transformer for sorting CANDIDATES."
+  (helm-ff-sort-candidates candidates nil))
+
 (defclass helm-ls-svn-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
    (data :initform 'helm-ls-svn-collect-data)
    (keymap :initform helm-ls-svn-map)
    (help-message :initform helm-generic-file-help-message)
+   (mode-line :initform helm-generic-file-mode-line-string)
+   (candidate-transformer :initform '(helm-ls-svn-transformer
+                                      helm-ls-svn-sort-fn))
    (candidate-number-limit :initform 9999)
    (action :initform (helm-actions-from-type-file))))
 
