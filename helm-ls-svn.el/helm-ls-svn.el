@@ -4,7 +4,7 @@
 
 ;; Author: Chunyang Xu <chunyang@macports.org>
 ;; Created: Wed Jun 10 20:58:26 CST 2015
-;; Version: 0.2.2
+;; Version: 0.2.3
 ;; URL: https://svn.macports.org/repository/macports/users/chunyang/helm-ls-svn.el/helm-ls-svn.el
 ;; Package-Requires: ((emacs "24.1") (helm "1.7.0") (cl-lib "0.5"))
 ;; Keywords: helm svn
@@ -95,6 +95,7 @@
 (require 'vc)
 (require 'vc-svn)
 (require 'helm-files)
+(require 'helm-types)
 
 ;; Define the sources.
 (defvar helm-source-ls-svn-status nil)
@@ -157,7 +158,7 @@ Return nil if not found."
   ;;                    (helm-ls-svn-root-dir) branch)))
   (format "%s (%s)" name (helm-ls-svn-root-dir)))
 
-(defun helm-ls-svn-collect-data()
+(defun helm-ls-svn-collect-data ()
   (let ((root (helm-ls-svn-root-dir)))
     (with-current-buffer (helm-candidate-buffer 'global)
       (let ((default-directory root))
@@ -279,11 +280,10 @@ Return nil if not found."
    (data :initform 'helm-ls-svn-collect-data)
    (keymap :initform helm-ls-svn-map)
    (help-message :initform helm-generic-file-help-message)
-   (mode-line :initform helm-generic-file-mode-line-string)
    (candidate-transformer :initform '(helm-ls-svn-transformer
                                       helm-ls-svn-sort-fn))
    (candidate-number-limit :initform 9999)
-   (action :initform (helm-actions-from-type-file))))
+   (action :initform helm-type-file-actions)))
 
 (defclass helm-ls-svn-status-source (helm-source-in-buffer)
   ((header-name :initform 'helm-ls-svn-header-name)
@@ -313,7 +313,7 @@ buffer is under a svn project."
        (user-error "Not under a svn repository"))
   (unless helm-source-ls-svn-buffers
     (setq helm-source-ls-svn-buffers
-          (helm-make-source "Buffers in project" 'helm-source-buffers
+          (helm-make-source "Buffers in svn project" 'helm-source-buffers
             :header-name #'helm-ls-svn-header-name
             :buffer-list (lambda () (helm-browse-project-get-buffers
                                      (helm-ls-svn-root-dir))))))
